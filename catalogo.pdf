@@ -1,0 +1,25 @@
+@app.route("/cargar_pdf", methods=["POST"])
+def cargar_pdf():
+    if "pdf" not in request.files:
+        return "No se subió archivo"
+
+    file = request.files["pdf"]
+
+    if file.filename == "":
+        return "Archivo vacío"
+
+    ruta = "catalogo.pdf"
+    file.save(ruta)
+
+    # 🔥 VALIDAR tamaño del archivo
+    if os.path.getsize(ruta) == 0:
+        return "El PDF está vacío o falló la carga"
+
+    texto = leer_pdf(ruta)
+    productos = extraer_productos(texto)
+
+    os.remove(ruta)
+
+    guardar_productos(productos)
+
+    return "PDF cargado correctamente"
